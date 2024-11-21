@@ -31,6 +31,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           _errorText = 'Minimal 8 karakter, kombinasi [A-Z], [a-z], [0,9], [!@#\\\$%^&*(),.?":{}|<>]';
         });
         return;
+      } else{
+        setState(() {
+          _errorText = "";
+        });
       }
 
       print("Sign Up Berhasil");
@@ -43,6 +47,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void dispose(){
     //TODO: implement dispose
+    _nameController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -65,7 +72,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: _nameController,
                     decoration: InputDecoration(
                       labelText: "Nama",
-                      errorText: _errorText.isNotEmpty ? _errorText:null,
                       border: const OutlineInputBorder(),
                     ),
                   ),
@@ -74,7 +80,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: _usernameController,
                     decoration: InputDecoration(
                       labelText: "Nama Pengguna",
-                      errorText: _errorText.isNotEmpty ? _errorText:null,
                       border: const OutlineInputBorder(),
                     ),
                   ),
@@ -85,6 +90,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       labelText: 'Kata Sandi',
                       errorText: _errorText.isNotEmpty ? _errorText:null,
                       border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility_off 
+                            : Icons.visibility),
+                      ),
                     ),
                     obscureText: _obscurePassword,
                   ),
