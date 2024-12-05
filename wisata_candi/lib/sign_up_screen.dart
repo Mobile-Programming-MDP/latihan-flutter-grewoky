@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -16,37 +17,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _obscurePassword = true;
 
-  //TODO 1 : Fungsi Signup
-  void _signUp(){
-    String name = _nameController.text.trim();
-    String username = _usernameController.text.trim();
-    String password = _passwordController.text.trim();
+  // TODO: 1. Membuat fungsi _signUp
+  void _signUp() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String name = _nameController.text.trim();
+    final String username = _usernameController.text.trim();
+    final String password = _passwordController.text.trim();
 
-    if(password.length < 8 ||
-      !password.contains(RegExp(r'[A-Z]')) ||
-      !password.contains(RegExp(r'[a-z]')) ||
-      !password.contains(RegExp(r'[0-9]')) ||
-      !password.contains(RegExp(r'[@#$%^&*(),.?":{}|<>]'))){
-        setState(() {
-          _errorText = 'Minimal 8 karakter, kombinasi [A-Z], [a-z], [0,9], [!@#\\\$%^&*(),.?":{}|<>]';
-        });
-        return;
-      } else{
-        setState(() {
-          _errorText = "";
-        });
-      }
+    if (password.length < 8 ||
+        !password.contains(RegExp(r'[A-Z]')) ||
+        !password.contains(RegExp(r'[a-z]')) ||
+        !password.contains(RegExp(r'[0-9]')) ||
+        !password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      setState(() {
+        _errorText =
+            'Minimal 8 karakter, kombinasi [A-Z], [a-z], [0-9], [!@#\\\$%^&*(),.?":{}|<>]';
+      });
+      return;
+    } else {
+      setState(() {
+        _errorText = '';
+      });
+    }
 
-      print("Sign Up Berhasil");
-      print("Nama : $name");
-      print("Nama Pengguna  : $username");
-      print("Password : $password");
+    // simpan data pengguna di SharedPreferences
+    prefs.setString('fulname', name);
+    prefs.setString('username', username);
+    prefs.setString('password', password);
+
+    // buat navigasi ke SignInScreen
+    Navigator.pushReplacementNamed(context, '/signin');
   }
 
-  //TODO 2 : Fungsi Dispose
+  // TODO: 2. Membuat fungsi dispose
   @override
-  void dispose(){
-    //TODO: implement dispose
+  void dispose() {
     _nameController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
@@ -70,47 +75,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   TextFormField(
                     controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: "Nama",
-                      border: const OutlineInputBorder(),
+                    decoration: const InputDecoration(
+                      labelText: 'Nama',
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
                     controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: "Nama Pengguna",
-                      border: const OutlineInputBorder(),
+                    decoration: const InputDecoration(
+                      labelText: 'Nama Pengguna',
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: 'Kata Sandi',
-                      errorText: _errorText.isNotEmpty ? _errorText:null,
+                      errorText: _errorText.isNotEmpty ? _errorText : null,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
                         onPressed: () {
                           setState(() {
                             _obscurePassword = !_obscurePassword;
                           });
                         },
-                        icon: Icon(_obscurePassword
-                            ? Icons.visibility_off 
-                            : Icons.visibility),
                       ),
                     ),
                     obscureText: _obscurePassword,
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(onPressed: _signUp, child: const Text("Sign Up"))
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: _signUp,
+                    child: const Text('Sign Up'),
+                  ),
                 ],
-              )),
+              ),
+            ),
           ),
         ),
       ),
-
     );
   }
 }
